@@ -1,0 +1,45 @@
+name: 🚀 Build Windows Executable (PyInstaller)
+
+on:
+  push:
+    branches: [ main ]
+  # Esto permite ejecutar el flujo de trabajo manualmente desde la pestaña 'Actions'
+  workflow_dispatch: 
+
+jobs:
+  build:
+    # Usaremos el runner de Ubuntu para compilar el .exe
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🔄 Checkout code
+      uses: actions/checkout@v4
+
+    # --- Pre-Compilación: Generar el .spec file localmente ---
+    # La acción requiere que el archivo principal esté en la raíz del 'path'
+    - name: 📝 Rename main script (Temporal)
+      run: mv src/BotGUI.py src/main.py
+
+    # --- Instalación y Compilación con PyInstaller ---
+    - name: 📦 Package Application with PyInstaller for Windows
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        # La ruta al directorio que contiene el script y requirements.txt
+        path: src
+        # Opciones de PyInstaller: 
+        # --onefile (un solo ejecutable), 
+        # --windowed (sin consola, ¡necesario para Tkinter!)
+        pyinstaller_options: --onefile --windowed
+
+    # --- Post-Compilación: Cargar el ejecutable como Artifact ---
+    - name: 📤 Upload Windows Executable Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Discord-Cleaner-Bot-GUI-Windows-Executable
+        # La acción de PyInstaller pone el .exe dentro de src/dist/windows
+        path: src/dist/windows/*
+        retention-days: 30
+
+    # --- Cleanup (Opcional) ---
+    - name: 🗑️ Cleanup temporary file
+      run: mv src/main.py src/BotGUI.py
