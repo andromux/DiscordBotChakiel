@@ -3,41 +3,35 @@ name: 🚀 Build Windows Executable (PyInstaller)
 on:
   push:
     branches: [ main ]
-  # Permite ejecutar manualmente el flujo de trabajo
   workflow_dispatch: 
 
 jobs:
   build:
-    # Usaremos el runner de Windows para la mejor compatibilidad de binarios (aunque la acción funciona en Linux/Ubuntu, Windows es más directo)
     runs-on: windows-latest 
 
     steps:
     - name: 🔄 Checkout code
       uses: actions/checkout@v4
 
+    # --- Este paso genera el EXE y el SPEC ---
     - name: 📦 Package Application with PyInstaller
       uses: sayyid5416/pyinstaller@v1
       with:
-        # Ruta al script principal dentro de la carpeta 'src'
-        spec: 'src/main.py'
-        
-        # Ruta al archivo de dependencias
+        # El archivo de entrada es src/main.py
+        spec: 'src/main.py' 
         requirements: 'src/requirements.txt'
-        
-        # Opciones de PyInstaller. Separadas por coma.
-        # --onefile: En un solo archivo
-        # --windowed: Sin ventana de consola (para la GUI)
         options: --onefile, --windowed
-        
-        # Versión de Python a usar para la compilación
         python_ver: '3.10'
         
-        # Nombre del Artifact a subir
-        upload_exe_with_name: 'Discord-Cleaner-Bot-GUI'
+        # El nombre del .zip que aparecerá en la pestaña Artifacts.
+        # ESTE ES EL PASO QUE SUBE EL EJECUTABLE.
+        upload_exe_with_name: 'Discord-Cleaner-Bot-GUI' 
 
-    - name: 📤 Upload Remaining .spec file (Opcional)
+    # --- Corrección 1: El archivo generado se llama main.spec ---
+    - name: 📤 Upload Generated .spec file (Opcional)
       uses: actions/upload-artifact@v4
       with:
         name: PyInstaller-Spec-File
-        path: ./BotGUI.spec
+        # RUTA CORREGIDA: Ahora busca 'main.spec'
+        path: ./main.spec 
         retention-days: 7
