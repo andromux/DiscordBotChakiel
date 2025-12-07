@@ -1,31 +1,43 @@
-name: Build Windows Executable (PyInstaller)
+name: 🚀 Build Windows Executable (PyInstaller)
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
+  # Permite ejecutar manualmente el flujo de trabajo
+  workflow_dispatch: 
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Usaremos el runner de Windows para la mejor compatibilidad de binarios (aunque la acción funciona en Linux/Ubuntu, Windows es más directo)
+    runs-on: windows-latest 
 
     steps:
     - name: 🔄 Checkout code
       uses: actions/checkout@v4
 
-
-    # --- Instalación y Compilación con PyInstaller ---
-    - name: 📦 Package Application with PyInstaller for Windows
-      uses: JackMcKew/pyinstaller-action-windows@main
+    - name: 📦 Package Application with PyInstaller
+      uses: sayyid5416/pyinstaller@v1
       with:
-        path: src
-        # *** ESTA LÍNEA FUE CORREGIDA: se usa 'args' en lugar de 'pyinstaller_options' ***
-        args: --onefile --windowed
+        # Ruta al script principal dentro de la carpeta 'src'
+        spec: 'src/main.py'
+        
+        # Ruta al archivo de dependencias
+        requirements: 'src/requirements.txt'
+        
+        # Opciones de PyInstaller. Separadas por coma.
+        # --onefile: En un solo archivo
+        # --windowed: Sin ventana de consola (para la GUI)
+        options: --onefile, --windowed
+        
+        # Versión de Python a usar para la compilación
+        python_ver: '3.10'
+        
+        # Nombre del Artifact a subir
+        upload_exe_with_name: 'Discord-Cleaner-Bot-GUI'
 
-    # --- Post-Compilación: Cargar el ejecutable como Artifact ---
-    - name: 📤 Upload Windows Executable Artifact
+    - name: 📤 Upload Remaining .spec file (Opcional)
       uses: actions/upload-artifact@v4
       with:
-        name: Discord-Cleaner-Bot-GUI-Windows-Executable
-        path: src/dist/windows/*
-        retention-days: 30
+        name: PyInstaller-Spec-File
+        path: ./BotGUI.spec
+        retention-days: 7
