@@ -16,8 +16,7 @@ jobs:
 
     # --- Pre-Compilación: Generar el .spec file localmente ---
     # La acción requiere que el archivo principal esté en la raíz del 'path'
-    - name: 📝 Rename main script (Temporal)
-      run: mv src/BotGUI.py src/main.py
+  
 
     # --- Instalación y Compilación con PyInstaller ---
     - name: 📦 Package Application with PyInstaller for Windows
